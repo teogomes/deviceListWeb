@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { login } from './Services/userCalls';
+import { login, signup } from './Services/userCalls';
 
 const authContext = createContext();
 
@@ -32,6 +32,11 @@ const useAuthProvider = () => {
     return result;
   };
 
+  const signUp = async (name, username, password) => {
+    const result = await signup({ username, name, password });
+    return result;
+  };
+
   const logout = async () => {
     localStorage.removeItem('token');
     setToken(null);
@@ -40,6 +45,7 @@ const useAuthProvider = () => {
   return {
     token,
     signIn,
+    signUp,
     logout,
   };
 };

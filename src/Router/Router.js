@@ -4,6 +4,36 @@ import DeviceList from '../Screens/DeviceList';
 import DeviceDetail from '../Screens/DeviceDetail';
 import Login from '../Screens/Login';
 import { useAuth } from '../useAuth';
+import Signup from '../Screens/Signup';
+import { useHistory } from 'react-router-dom';
+
+const LoginFlow = () => {
+  return (
+    <div className='auth-wrapper'>
+      <div className='auth-inner'>
+        <nav className='loginFlowNav'>
+          <div className='nav-item'>
+            <Link to={'/sign-in'} style={{ textDecoration: 'none' }}>
+              Login
+            </Link>
+          </div>
+          <div className='nav-item'>
+            <Link to={'/sign-up'} style={{ textDecoration: 'none' }}>
+              Sign up
+            </Link>
+          </div>
+        </nav>
+        <div className='auth-container'>
+          <Switch>
+            <Route exact path='/' component={Login} />
+            <Route path='/sign-in' component={Login} />
+            <Route path='/sign-up' component={Signup} />
+          </Switch>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const Router = () => {
   const auth = useAuth();
@@ -12,18 +42,11 @@ const Router = () => {
       <NavBar />
       {auth.token ? (
         <Switch>
-          <Route path='/detail' component={DeviceDetail} />
           <Route exact path='/' component={DeviceList} />
+          <Route path='/detail' component={DeviceDetail} />
         </Switch>
       ) : (
-        <div className='auth-wrapper'>
-          <div className='auth-inner'>
-            <Switch>
-              <Route path='/' component={Login} />
-              {/* <Route path='/sign-up' component={Login} /> */}
-            </Switch>
-          </div>
-        </div>
+        <LoginFlow />
       )}
     </BrowserRouter>
   );
@@ -31,13 +54,19 @@ const Router = () => {
 
 const NavBar = () => {
   const auth = useAuth();
-
+  const history = useHistory();
   if (!auth.token) {
     return null;
   }
   return (
     <div className='navbar navbar-expand-lg navbar-light bg-light justify-content-end px-3'>
-      <button className='btn btn-danger px-3 me-2' onClick={auth.logout}>
+      <button
+        className='btn btn-danger px-3 me-2'
+        onClick={() => {
+          history.replace('/');
+          auth.logout();
+        }}
+      >
         Logout
       </button>
     </div>

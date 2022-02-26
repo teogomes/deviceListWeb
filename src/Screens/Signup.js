@@ -1,22 +1,27 @@
 import React, { useState } from 'react';
-import { useAuth } from '../useAuth';
 import { useHistory } from 'react-router-dom';
-import { login } from '../Services/userCalls';
+import { useAuth } from '../useAuth';
 
-const Login = () => {
+const Signup = () => {
   const auth = useAuth();
+  const history = useHistory();
+  const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  let history = useHistory();
 
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
+      await auth.signUp(name, username, password);
       await auth.signIn(username, password);
       history.push('/');
     } catch (e) {
       alert(JSON.stringify(e.response?.data?.error));
     }
+  };
+
+  const onChangeName = (e) => {
+    setName(e.target.value);
   };
 
   const onChangeUsername = (e) => {
@@ -29,7 +34,16 @@ const Login = () => {
 
   return (
     <form className='form'>
-      <h3>Sign In</h3>
+      <h3>Sign Up</h3>
+      <div className='form-group'>
+        <label>Name</label>
+        <input
+          type='name'
+          className='form-control'
+          placeholder='Enter name'
+          onChange={onChangeName}
+        />
+      </div>
       <div className='form-group'>
         <label>Username</label>
         <input
@@ -74,4 +88,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;
