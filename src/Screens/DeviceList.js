@@ -1,12 +1,23 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { useHistory } from "react-router-dom";
 import useThemedStyles from "../Theme/useThemedStyles";
 import QRCode from "react-qr-code";
+import { getDevices } from "../Services/devicesCalls";
 
 function DeviceList({ devices }) {
   const styles = useThemedStyles(style);
+  const [registeredDevices, setRegisteredDevices] = useState(devices ?? []);
   let history = useHistory();
+
+  const fetchDevices = () => {
+    getDevices().then((res) => {
+      setRegisteredDevices(res.data);
+    });
+  };
+
+  useEffect(fetchDevices, []);
+
   const onFabPress = () => {
     history.push("/detail");
   };
@@ -15,13 +26,12 @@ function DeviceList({ devices }) {
     const onCardPress = () => {
       history.push({
         pathname: "/detail",
-        search: "?query=abc",
-        state: { device: item },
+        state: { deviceId: item.id },
       });
     };
 
     return (
-      <div onClick={onCardPress}>
+      <div key={item.id} onClick={onCardPress}>
         <div style={styles.itemSubContainer}>
           <div>
             <div>
@@ -46,7 +56,7 @@ function DeviceList({ devices }) {
 
   return (
     <div style={styles.container}>
-      {devices.map(renderItem)}
+      {registeredDevices.map(renderItem)}
       <div onClick={onFabPress} style={styles.fab}>
         <img
           style={styles.fabIcon}

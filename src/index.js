@@ -1,11 +1,14 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import { Provider } from "react-redux";
-import "./index.css";
-import store from "./Redux/store";
-import App from "./App";
-import reportWebVitals from "./reportWebVitals";
-import ThemeProvider from "./Theme/ThemeProvider";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import $ from 'jquery';
+import Popper from 'popper.js';
+import './index.css';
+import store from './Redux/store';
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+import ThemeProvider from './Theme/ThemeProvider';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -15,7 +18,7 @@ ReactDOM.render(
       </ThemeProvider>
     </Provider>
   </React.StrictMode>,
-  document.getElementById("root")
+  document.getElementById('root')
 );
 
 // If you want to start measuring performance in your app, pass a function
