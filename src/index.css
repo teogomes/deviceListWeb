@@ -107,3 +107,9 @@ html,
 .forgot-password a {
   color: #167bff;
 }
+.device-card-container {
+  margin: 16px;
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 2px 4px 2px 0px rgba(0, 0, 0, 0.44);
+}

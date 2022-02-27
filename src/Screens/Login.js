@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../useAuth';
 import { useHistory } from 'react-router-dom';
-import { login } from '../Services/userCalls';
 
 const Login = () => {
   const auth = useAuth();
@@ -33,6 +32,7 @@ const Login = () => {
       <div className='form-group'>
         <label>Username</label>
         <input
+          id='username'
           type='name'
           className='form-control'
           placeholder='Enter username'
@@ -42,6 +42,7 @@ const Login = () => {
       <div className='form-group'>
         <label>Password</label>
         <input
+          id='password'
           type='password'
           className='form-control'
           placeholder='Enter password'
@@ -61,6 +62,7 @@ const Login = () => {
         </div>
       </div>
       <button
+        id='login-button'
         type='submit'
         onClick={onSubmit}
         className='btn btn-primary btn-block'

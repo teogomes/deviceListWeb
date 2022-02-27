@@ -1,113 +1,69 @@
-import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
-import { useHistory } from "react-router-dom";
-import useThemedStyles from "../Theme/useThemedStyles";
-import QRCode from "react-qr-code";
-import { getDevices } from "../Services/devicesCalls";
+import React, { useCallback, useEffect, useState } from 'react';
+import { connect } from 'react-redux';
+import { useHistory } from 'react-router-dom';
+import useThemedStyles from '../Theme/useThemedStyles';
+import DeviceCard from './Components/DeviceCard';
+import { useQuery } from '@apollo/client';
+import { GET_DEVICES } from '../Services/graphql/queries';
 
-function DeviceList({ devices }) {
+const DeviceList = ({ devices }) => {
   const styles = useThemedStyles(style);
-  const [registeredDevices, setRegisteredDevices] = useState(devices ?? []);
   let history = useHistory();
+  const result = useQuery(GET_DEVICES);
 
-  const fetchDevices = () => {
-    getDevices().then((res) => {
-      setRegisteredDevices(res.data);
-    });
-  };
-
-  useEffect(fetchDevices, []);
+  const onCardPress = useCallback(
+    (device) => {
+      history.push(`/detail/${device.id}`);
+    },
+    [history]
+  );
 
   const onFabPress = () => {
-    history.push("/detail");
-  };
-
-  const renderItem = (item) => {
-    const onCardPress = () => {
-      history.push({
-        pathname: "/detail",
-        state: { deviceId: item.id },
-      });
-    };
-
-    return (
-      <div key={item.id} onClick={onCardPress}>
-        <div style={styles.itemSubContainer}>
-          <div>
-            <div>
-              Model: <b style={styles.value}> {item.model}</b>
-            </div>
-            <div>
-              OS: <b style={styles.value}> {item.os}</b>
-            </div>
-            <div>
-              Owner: <b style={styles.value}> {item.owner}</b>
-            </div>
-            <div>
-              Notes: <b style={styles.value}> {item.notes}</b>
-            </div>
-          </div>
-          <QRCode size={60} value={JSON.stringify(item)} />
-        </div>
-        <div style={styles.line} />
-      </div>
-    );
+    history.push('/detail');
   };
 
   return (
     <div style={styles.container}>
-      {registeredDevices.map(renderItem)}
-      <div onClick={onFabPress} style={styles.fab}>
+      {result?.data?.allDevices?.map((item) => (
+        <DeviceCard
+          key={item.id}
+          device={item}
+          onClick={() => onCardPress(item)}
+        />
+      ))}
+      <div id='fab-button' onClick={onFabPress} style={styles.fab}>
         <img
           style={styles.fabIcon}
-          alt={"fabIcon"}
+          alt={'fabIcon'}
           src={
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPa5ldL9PLxqVqbPzS-ZrOYYdDzMSsRuoMJg&usqp=CAU"
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPa5ldL9PLxqVqbPzS-ZrOYYdDzMSsRuoMJg&usqp=CAU'
           }
         />
       </div>
     </div>
   );
-}
+};
 
 const style = (theme) => {
   return {
     container: {
       flex: 1,
-      backgroundColor: theme.colors.primary,
     },
-    itemContainer: {
-      flex: 1,
-      backgroundColor: theme.colors.secondary,
-    },
-    itemSubContainer: {
-      flex: 1,
-      display: "flex",
-      flexDirection: "row",
-      justifyContent: "space-between",
-      padding: 16,
-      alignItems: "center",
-      flexWrap: "wrap",
-    },
-    value: {
-      color: theme.colors.secondary,
-    },
-    line: {
-      flex: 1,
-      height: 1,
-      backgroundColor: "white",
-      opacity: 1,
+    fabWrapper: {
+      position: 'fixed',
+      height: '100%',
+      width: '100%',
     },
     fab: {
-      display: "flex",
+      display: 'flex',
       height: 100,
       width: 100,
-      position: "absolute",
-      bottom: theme.sizes.largeMargin,
+      position: 'absolute',
+      bottom: 100,
       right: theme.sizes.margin,
       borderRadius: 50,
-      alignItems: "center",
-      justifyContent: "center",
+      alignItems: 'center',
+      justifyContent: 'center',
       backgroundColor: theme.colors.primary,
     },
     fabIcon: {

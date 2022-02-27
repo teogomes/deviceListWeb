@@ -43,6 +43,7 @@ const Router = () => {
       {auth.token ? (
         <Switch>
           <Route exact path='/' component={DeviceList} />
+          <Route path='/detail/:id' component={DeviceDetail} />
           <Route path='/detail' component={DeviceDetail} />
         </Switch>
       ) : (

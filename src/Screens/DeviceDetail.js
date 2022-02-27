@@ -4,19 +4,27 @@ import { connect } from 'react-redux';
 import useThemedStyles from '../Theme/useThemedStyles';
 import { useLocation } from 'react-router-dom';
 import { useHistory } from 'react-router-dom';
-import { getQuoteOfTheDay } from '../Services/quoteCalls';
+import { useParams } from 'react-router-dom';
+import { useMutation, useQuery } from '@apollo/client';
 import {
-  addDevice,
-  deleteDevice,
-  getDevice,
-  editDevice,
-} from '../Services/devicesCalls';
+  ADD_DEVICE,
+  DELETE_DEVICE,
+  EDIT_DEVICE,
+  FIND_DEVICE,
+} from '../Services/graphql/queries';
 
 const DeviceDetail = () => {
   const styles = useThemedStyles(style);
   const history = useHistory();
   const location = useLocation();
-  const selectedDeviceId = location?.state?.deviceId;
+  const selectedDeviceId = useParams().id;
+  const result = useQuery(FIND_DEVICE, {
+    variables: { id: selectedDeviceId },
+    skip: !selectedDeviceId,
+  });
+  const [addDevice] = useMutation(ADD_DEVICE);
+  const [deleteDevice] = useMutation(DELETE_DEVICE);
+  const [editDevice] = useMutation(EDIT_DEVICE);
   const [device, setDevice] = useState({
     id: Math.random(),
     owner: '',
@@ -26,15 +34,13 @@ const DeviceDetail = () => {
   });
 
   const fetchDevice = () => {
-    if (!selectedDeviceId) {
+    if (!result?.data) {
       return;
     }
-    getDevice(selectedDeviceId).then((res) => {
-      setDevice(res.data);
-    });
+    setDevice(result?.data.findDevice);
   };
 
-  useEffect(fetchDevice, []);
+  useEffect(fetchDevice, [result.data]);
 
   useEffect(() => {
     if (location?.state?.device) {
@@ -42,24 +48,39 @@ const DeviceDetail = () => {
     }
   }, [location]);
 
-  const onActionButtonPress = () => {
-    selectedDeviceId ? editDevice(selectedDeviceId, device) : addDevice(device);
+  const onActionButtonPress = async () => {
+    if (selectedDeviceId) {
+      await editDevice({
+        variables: { ...device, id: selectedDeviceId },
+      });
+    } else {
+      const result = await addDevice({
+        variables: {
+          owner: device.owner,
+          model: device.model,
+          os: device.os,
+          notes: device.notes,
+        },
+      });
+
+      console.error(result);
+    }
+
     history.goBack();
   };
 
   const onConfirm = () => {
-    deleteDevice(device.id).then((res) => {
+    deleteDevice({
+      variables: {
+        id: selectedDeviceId,
+      },
+    }).then((res) => {
       console.log(res.data);
       history.goBack();
     });
   };
 
   const onDeletePress = () => {
-    // getQuoteOfTheDay().then((res) => {
-    //   if (res.data.length > 0) {
-    //     window.confirm(res.data[0].q) && onConfirm();
-    //   }
-    // });
     onConfirm();
   };
 
@@ -122,7 +143,11 @@ const DeviceDetail = () => {
             Delete
           </button>
         )}
-        <button onClick={onActionButtonPress} style={styles.actionButton}>
+        <button
+          id='add-button'
+          onClick={onActionButtonPress}
+          style={styles.actionButton}
+        >
           {selectedDeviceId ? 'Edit' : 'Add'}
         </button>
       </div>
