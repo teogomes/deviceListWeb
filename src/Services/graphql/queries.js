@@ -1,30 +1,35 @@
 import { gql } from '@apollo/client';
 
+export const DEVICE_DETAILS_FRAGMENT = gql`
+  fragment DeviceDetails on Device {
+    model
+    owner
+    os
+    notes
+    id
+  }
+`;
+
 export const GET_DEVICES = gql`
+  ${DEVICE_DETAILS_FRAGMENT}
   query {
     allDevices {
-      model
-      owner
-      os
-      notes
-      id
+      ...DeviceDetails
     }
   }
 `;
 
 export const FIND_DEVICE = gql`
+  ${DEVICE_DETAILS_FRAGMENT}
   query findDevice($id: ID!) {
     findDevice(id: $id) {
-      model
-      owner
-      os
-      notes
-      id
+      ...DeviceDetails
     }
   }
 `;
 
 export const ADD_DEVICE = gql`
+  ${DEVICE_DETAILS_FRAGMENT}
   mutation createDevice(
     $model: String
     $owner: String
@@ -32,16 +37,13 @@ export const ADD_DEVICE = gql`
     $notes: String
   ) {
     addDevice(owner: $owner, model: $model, os: $os, notes: $notes) {
-      model
-      owner
-      os
-      notes
-      id
+      ...DeviceDetails
     }
   }
 `;
 
 export const EDIT_DEVICE = gql`
+  ${DEVICE_DETAILS_FRAGMENT}
   mutation editDevice(
     $id: ID!
     $owner: String
@@ -50,23 +52,16 @@ export const EDIT_DEVICE = gql`
     $notes: String
   ) {
     editDevice(id: $id, owner: $owner, model: $model, os: $os, notes: $notes) {
-      model
-      owner
-      os
-      notes
-      id
+      ...DeviceDetails
     }
   }
 `;
 
 export const DELETE_DEVICE = gql`
+  ${DEVICE_DETAILS_FRAGMENT}
   mutation deleteDevice($id: ID!) {
     deleteDevice(id: $id) {
-      model
-      owner
-      os
-      notes
-      id
+      ...DeviceDetails
     }
   }
 `;

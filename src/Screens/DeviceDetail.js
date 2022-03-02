@@ -11,6 +11,7 @@ import {
   DELETE_DEVICE,
   EDIT_DEVICE,
   FIND_DEVICE,
+  GET_DEVICES,
 } from '../Services/graphql/queries';
 
 const DeviceDetail = () => {
@@ -22,9 +23,15 @@ const DeviceDetail = () => {
     variables: { id: selectedDeviceId },
     skip: !selectedDeviceId,
   });
-  const [addDevice] = useMutation(ADD_DEVICE);
-  const [deleteDevice] = useMutation(DELETE_DEVICE);
-  const [editDevice] = useMutation(EDIT_DEVICE);
+  const [addDevice] = useMutation(ADD_DEVICE, {
+    refetchQueries: [{ query: GET_DEVICES }],
+  });
+  const [deleteDevice] = useMutation(DELETE_DEVICE, {
+    refetchQueries: [{ query: GET_DEVICES }],
+  });
+  const [editDevice] = useMutation(EDIT_DEVICE, {
+    refetchQueries: [{ query: GET_DEVICES }],
+  });
   const [device, setDevice] = useState({
     id: Math.random(),
     owner: '',

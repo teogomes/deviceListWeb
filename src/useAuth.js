@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { login, signup } from './Services/userCalls';
+import { LOGIN } from './Services/graphql/authQueries';
+import { signup } from './Services/userCalls';
+import { useMutation } from '@apollo/client';
 
 const authContext = createContext();
 
@@ -14,6 +16,7 @@ export const AuthProvider = ({ children }) => {
 
 const useAuthProvider = () => {
   const [token, setToken] = useState(null);
+  const [login, result] = useMutation(LOGIN);
 
   useEffect(() => {
     const tokenFromStorage = localStorage.getItem('token');
@@ -23,13 +26,14 @@ const useAuthProvider = () => {
   }, []);
 
   const signIn = async (username, password) => {
-    const result = await login({ username, password });
-    const token = result?.data?.token;
-    if (token) {
-      localStorage.setItem('token', token);
+    return login({ variables: { username, password } }).then(({ data }) => {
+      const { token } = data?.login;
+      if (!token) {
+        return;
+      }
       setToken(token);
-    }
-    return result;
+      return localStorage.setItem('token', token);
+    });
   };
 
   const signUp = async (name, username, password) => {
